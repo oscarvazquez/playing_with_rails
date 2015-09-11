@@ -1,0 +1,25 @@
+<h1>all products</h1>
+<a href = "/users/<%= session[:user_id] %>/show">Go to Dashboard</a>
+<table>
+	<tr>
+		<td>Product</td>
+		<td>Seller</td>
+		<td>Date Posted</td>
+		<td>Amount</td>
+		<td>Action</td>
+	</tr>
+<% @products.each do |product| %>
+	<% if Product.not_bought.include?(product) %>
+		<tr>
+			<td><%= product.product %></td>
+			<td><%= product.user.first_name %></td>
+			<td><%= product.created_at.strftime("%B %d, %Y") %></td>
+			<td><form action = '/sales/<%= product.id %>/create' method = "post">
+				<input type = "hidden" name = 'authenticity_token' value = "<%= form_authenticity_token %>">
+				<input type = "submit" value = "buy">
+			</form></td>
+		</tr>
+	<% end %>
+<% end %>
+</table>
+

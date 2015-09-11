@@ -1,0 +1,90 @@
+<style>
+	.currencyinput {
+    border: 1px inset #ccc;
+}
+.currencyinput input {
+    border: 0;
+}
+</style>
+<h1> Hi, <%= @user.first_name %></h1>
+<a href = "/products/show">Show Products</a>
+<form action = '/products/<%= @user.id %>/create' method = "post">
+	<input type = "hidden" name = 'authenticity_token' value = "<%= form_authenticity_token %>">
+	Product: <input type = "text" name = "product">
+	Amount: <span class="currencyinput">$<input type="text" name="amount"></span>
+	<input type = "submit" value = 'sell'>
+</form>
+<h3>Your Products that are not sold yet</h3>
+<table>
+	<tr>
+		<td>Product</td>
+		<td>Seller</td>
+		<td>Date Posted</td>
+		<td>Amount</td>
+		<td>Action</td>
+	</tr>
+<% if @products %>		
+	<% @products.each do |product| %>
+		<% if Product.not_bought.include?(product) %>
+			<tr>
+				<td><%= product.product %></td>
+				<td><%= product.user.first_name %></td>
+				<td><%= product.created_at.strftime("%B %d, %Y") %></td>
+				<td><%= product.amount %></td>
+				<td><form action = '/products/<%= product.id %>/destroy' method = "post">
+					<input type = "hidden" name = 'authenticity_token' value = "<%= form_authenticity_token %>">
+					<input type = "hidden" name = "_method" value = 'delete'>
+					<input type = "submit" value = "remove">
+				</form></td>
+			</tr>
+		<% end %>
+	<% end %>
+<% end %>
+</table>
+
+<h3>Your Products that are sold</h3>
+<table>
+	<tr>
+		<td>Product</td>
+		<td>Date Sold</td>
+		<td>Amount</td>
+		<td>Buyer</td>
+	</tr>
+<% if @products %>
+	<% @products.each do |product| %>
+		<% if Product.bought.include?(product) %>
+		<% @total_amount += product.amount %>
+			<tr>
+				<td><%= product.product %></td>
+				<td><%= product.sale.created_at.strftime("%B %d, %Y") %></td>
+				<td><%= product.amount %></td>
+				<td><%= product.sale.user.first_name %></td>
+			</tr>
+		<% end %>
+	<% end %>
+<% end %>
+</table>
+<h1>Total Amount: <%= @total_amount %></h1>
+
+<h3>Products Bought by you: </h3>
+<table>
+	<tr>
+		<td>Product</td>
+		<td>Date Bought</td>
+		<td>Seller</td>
+		<td>Amount</td>
+	</tr>
+<% if @sales %>
+	<% @sales.each do |sales| %>
+	<% @total_amount2 += sales.product.amount %>
+			<tr>
+				<td><%= sales.product.product %></td>
+				<td><%= sales.created_at.strftime("%B %d, %Y") %></td>
+				<td><%= sales.product.user.first_name %></td>
+				<td><%= sales.product.amount %></td>
+			</tr>
+	<% end %>
+<% end %>
+</table>
+<h1>Total Amount: <%= @total_amount2 %></h1>
+
